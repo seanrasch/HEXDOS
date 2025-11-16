@@ -14,10 +14,21 @@ class OSIC1P {
         this.SCREEN_END = 0xD3FF;
         this.KEYBOARD = 0xDF00;
         this.KEYBOARD_STATUS = 0xDF00;
+        this.DISK_STATUS = 0xC000;
+        this.DISK_DATA = 0xC010;
 
         // Keyboard state
         this.keyBuffer = [];
         this.lastKey = 0;
+
+        // Disk controller
+        this.diskController = new DiskController();
+
+        // Debugger
+        this.debugger = new Debugger(this.cpu);
+
+        // Display cursor position for improved output
+        this.cursorPos = 0;
 
         // ROM
         this.loadBasicROM();
@@ -31,7 +42,7 @@ class OSIC1P {
     }
 
     setupIO() {
-        // Screen memory write
+        // Screen memory write with cursor tracking
         for (let addr = this.SCREEN_START; addr <= this.SCREEN_END; addr++) {
             this.cpu.writeCallbacks[addr] = ((a) => {
                 return (value) => {
@@ -39,6 +50,11 @@ class OSIC1P {
                     const offset = a - this.SCREEN_START;
                     if (offset < 1024) { // 32x32 screen
                         this.terminal.screen[offset] = value;
+                        // Update cursor position
+                        this.cursorPos = offset;
+                        const x = offset % 32;
+                        const y = Math.floor(offset / 32);
+                        this.terminal.setCursor(x, y);
                     }
                 };
             })(addr);
@@ -52,6 +68,19 @@ class OSIC1P {
                 this.lastKey &= 0x7F; // Clear bit 7 when no key
             }
             return this.lastKey;
+        };
+
+        // Disk controller I/O
+        this.cpu.readCallbacks[this.DISK_STATUS] = () => {
+            return this.diskController.readStatus();
+        };
+
+        this.cpu.readCallbacks[this.DISK_DATA] = () => {
+            return this.diskController.dataRegister;
+        };
+
+        this.cpu.writeCallbacks[this.DISK_DATA] = (value) => {
+            this.diskController.dataRegister = value;
         };
     }
 

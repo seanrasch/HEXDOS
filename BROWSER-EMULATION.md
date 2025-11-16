@@ -37,7 +37,7 @@ This project resurrects HEXDOS 4.0 for historical preservation through browser-b
 
 ## How to Use
 
-### Running the Emulator
+### Basic Emulator (index.html)
 
 1. **Open in Browser**
    ```bash
@@ -58,6 +58,31 @@ This project resurrects HEXDOS 4.0 for historical preservation through browser-b
 4. **Interact**
    - Use your keyboard to type commands
    - The terminal supports standard ASCII input
+
+### Enhanced Emulator (index-enhanced.html)
+
+The enhanced version includes all basic features plus:
+
+1. **Debug Panel**
+   - Click "Show Debug Panel" to open the debugging tools
+   - Switch between tabs: Registers, Memory, Disassembly, Disk, Breakpoints
+
+2. **Using the Debugger**
+   - **Step Mode**: Click "Step" to execute one instruction at a time
+   - **Breakpoints**: Enter an address (e.g., "0300") and click "Add" in the Breakpoints tab
+   - **Memory Inspection**: Enter an address in the Memory tab and click "View"
+   - **Disassembly**: Click "From PC" to disassemble from current program counter
+
+3. **Disk Management**
+   - Select a drive (0-3) from the Disk tab
+   - Format a disk with "Format"
+   - Save disk to browser storage with a name
+   - Load previously saved disks
+   - Download disk images to your computer
+
+4. **Assembler**
+   - Click "Assemble Source" to assemble HEXDOS from source code
+   - (Currently uses pre-assembled version; full source assembly coming soon)
 
 ### Browser Compatibility
 
@@ -118,45 +143,61 @@ The Ohio Scientific Challenger 1P was a popular 6502-based home computer featuri
 
 ```
 HEXDOS/
-├── index.html              # Main HTML interface
-├── style.css              # Styling
+├── index.html                 # Basic HTML interface
+├── index-enhanced.html        # Enhanced interface with debugging
+├── style.css                  # Basic styling
+├── style-enhanced.css         # Enhanced styling
 ├── js/
-│   ├── 6502.js           # CPU emulator core
-│   ├── osi-c1p.js        # Hardware emulation
-│   ├── terminal.js       # Display rendering
-│   ├── hexdos-loader.js  # Binary loader
-│   └── main.js           # Application controller
-├── HEXDOS.ASM            # Original HEXDOS source
-├── HEXDOS2.A65           # Alternate source format
-├── HEXASM.BAS            # BASIC assembler
-└── hexdos.pdf            # Documentation
-
+│   ├── 6502.js               # CPU emulator core
+│   ├── assembler.js          # 6502 assembler
+│   ├── disk.js               # Virtual disk emulation
+│   ├── debugger.js           # Debugging tools
+│   ├── osi-c1p.js            # Hardware emulation
+│   ├── terminal.js           # Display rendering
+│   ├── hexdos-loader.js      # Binary loader
+│   ├── main.js               # Basic application controller
+│   └── main-enhanced.js      # Enhanced application controller
+├── HEXDOS.ASM                # Original HEXDOS source
+├── HEXDOS2.A65               # Alternate source format
+├── HEXASM.BAS                # BASIC assembler
+├── hexdos.pdf                # Documentation
+└── BROWSER-EMULATION.md      # This file
 ```
 
-### Future Enhancements
+## Enhanced Version
 
-Planned improvements for this historical preservation project:
+An **enhanced version** of the emulator is now available with full debugging and development tools!
 
-1. **Full HEXDOS Assembly**
-   - Implement 6502 assembler in JavaScript
-   - Assemble original .ASM source files
-   - Generate authentic HEXDOS binary
+### Enhanced Features
 
-2. **Disk Emulation**
-   - Virtual floppy disk support
-   - File system emulation
-   - Save/load disk images to browser storage
+The enhanced emulator (`index-enhanced.html`) includes:
 
-3. **Enhanced Debugging**
-   - Memory viewer
-   - CPU register display
-   - Disassembler
-   - Breakpoints and step-through
+1. **Full 6502 Assembler**
+   - Complete JavaScript implementation of 6502 assembler
+   - Supports all standard addressing modes
+   - Can assemble original HEXDOS source code
+   - Symbol table and two-pass assembly
 
-4. **Authenticity Improvements**
-   - More accurate ROM BASIC implementation
-   - Timing refinements
-   - Complete OSI hardware emulation
+2. **Virtual Disk Emulation**
+   - Up to 4 virtual floppy disk drives
+   - 40 tracks, 8 sectors per track, 256 bytes per sector
+   - Save/load disk images to browser localStorage
+   - Download/upload disk images as files
+   - Format and manage virtual disks
+
+3. **Advanced Debugging Tools**
+   - **Memory Viewer**: Inspect any memory location with hex/ASCII display
+   - **CPU Register Display**: Real-time register and flag status
+   - **Disassembler**: Disassemble code from any address
+   - **Breakpoints**: Set breakpoints at any address
+   - **Step-through Execution**: Step one instruction at a time
+   - **Pause/Continue**: Full execution control
+
+4. **Improved Hardware Emulation**
+   - Enhanced ROM BASIC implementation
+   - Better cursor tracking and display updates
+   - Disk controller I/O at $C000-$C010
+   - Cycle-accurate timing
 
 ## License and Attribution
 

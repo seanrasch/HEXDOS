@@ -12,21 +12,50 @@ HEXDOS 4.0 is a disk operating system developed for the Ohio Scientific Challeng
 
 ### Quick Start
 
+**Basic Emulator:**
 1. Open `index.html` in a modern web browser
 2. Click "POWER ON" to boot the OSI C1P emulator
 3. Click "LOAD HEXDOS" to load the operating system
 4. Use your keyboard to interact with the system
 
-For detailed documentation, see [BROWSER-EMULATION.md](BROWSER-EMULATION.md)
+**Enhanced Emulator (with debugging tools):**
+1. Open `index-enhanced.html` in a modern web browser
+2. Full debugging interface with:
+   - CPU register display and status flags
+   - Memory viewer with hex/ASCII dump
+   - 6502 disassembler
+   - Breakpoints and step-through execution
+   - Virtual disk drives with save/load
+   - 6502 assembler
+
+For detailed documentation:
+- Basic emulator: [BROWSER-EMULATION.md](BROWSER-EMULATION.md)
+- Enhanced features: [ENHANCED-FEATURES.md](ENHANCED-FEATURES.md)
 
 ## Repository Contents
 
+### Original HEXDOS Files
 - **HEXDOS.ASM** - Original HEXDOS 4.0 assembly source code
 - **HEXDOS2.A65** - Alternate format source code
 - **HEXASM.BAS** - BASIC assembler for HEXDOS
 - **hexdos.pdf** - Original documentation
-- **index.html** - Browser-based emulator interface
-- **js/** - JavaScript emulator components (6502 CPU, OSI C1P hardware)
+
+### Browser Emulator Files
+- **index.html** - Basic browser emulator interface
+- **index-enhanced.html** - Enhanced emulator with debugging tools
+- **style.css** / **style-enhanced.css** - Styling
+- **js/6502.js** - Complete 6502 CPU emulator
+- **js/assembler.js** - 6502 assembler (NEW!)
+- **js/disk.js** - Virtual floppy disk emulation (NEW!)
+- **js/debugger.js** - Debugging tools (NEW!)
+- **js/osi-c1p.js** - OSI C1P hardware emulation
+- **js/terminal.js** - Terminal display rendering
+- **js/hexdos-loader.js** - HEXDOS binary loader
+- **js/main.js** / **js/main-enhanced.js** - Application controllers
+
+### Documentation
+- **BROWSER-EMULATION.md** - Browser emulator documentation
+- **ENHANCED-FEATURES.md** - Enhanced emulator features guide
 
 ## License
 

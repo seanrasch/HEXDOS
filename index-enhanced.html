@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEXDOS 4.0 Enhanced - Ohio Scientific C1P Emulator</title>
+    <link rel="stylesheet" href="style-enhanced.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HEXDOS 4.0 Enhanced Emulator</h1>
+            <p>Ohio Scientific Challenger 1P - Full Featured Browser Emulation</p>
+            <p class="copyright">Based on HEXDOS by Steven P. Hendrix (1980-2015)</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Left Panel: Terminal and Controls -->
+            <div class="left-panel">
+                <div class="controls">
+                    <button id="powerBtn" class="btn btn-power">POWER ON</button>
+                    <button id="resetBtn" class="btn btn-reset" disabled>RESET</button>
+                    <button id="loadHexdosBtn" class="btn btn-load" disabled>LOAD HEXDOS</button>
+                    <button id="assembleBtn" class="btn btn-assemble" disabled>ASSEMBLE SOURCE</button>
+                    <div class="status">
+                        <span id="statusText">System Off</span>
+                        <span id="cpuSpeed" class="cpu-speed"></span>
+                    </div>
+                </div>
+
+                <div class="terminal-container">
+                    <canvas id="terminal" width="512" height="480"></canvas>
+                    <div id="overlay-message" class="overlay-message">
+                        Press POWER ON to start the Ohio Scientific C1P emulator
+                    </div>
+                </div>
+
+                <!-- Debug Controls -->
+                <div class="debug-controls">
+                    <button id="debugToggle" class="btn btn-debug" disabled>Show Debug Panel</button>
+                    <button id="stepBtn" class="btn btn-step" disabled>Step</button>
+                    <button id="pauseBtn" class="btn btn-pause" disabled>Pause</button>
+                    <button id="continueBtn" class="btn btn-continue" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Debugging and Tools -->
+            <div class="right-panel" id="debugPanel" style="display: none;">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="registers">Registers</button>
+                    <button class="tab-btn" data-tab="memory">Memory</button>
+                    <button class="tab-btn" data-tab="disasm">Disassembly</button>
+                    <button class="tab-btn" data-tab="disk">Disk</button>
+                    <button class="tab-btn" data-tab="breakpoints">Breakpoints</button>
+                </div>
+
+                <!-- Registers Tab -->
+                <div class="tab-content active" id="registers-tab">
+                    <h3>CPU Registers</h3>
+                    <div class="registers">
+                        <div class="register">
+                            <span class="reg-name">PC:</span>
+                            <span id="reg-pc" class="reg-value">0000</span>
+                        </div>
+                        <div class="register">
+                            <span class="reg-name">SP:</span>
+                            <span id="reg-sp" class="reg-value">00</span>
+                        </div>
+                        <div class="register">
+                            <span class="reg-name">A:</span>
+                            <span id="reg-a" class="reg-value">00</span>
+                        </div>
+                        <div class="register">
+                            <span class="reg-name">X:</span>
+                            <span id="reg-x" class="reg-value">00</span>
+                        </div>
+                        <div class="register">
+                            <span class="reg-name">Y:</span>
+                            <span id="reg-y" class="reg-value">00</span>
+                        </div>
+                        <div class="register">
+                            <span class="reg-name">P:</span>
+                            <span id="reg-p" class="reg-value">00</span>
+                        </div>
+                    </div>
+                    <h4>Status Flags</h4>
+                    <div class="flags">
+                        <span class="flag" id="flag-n">N</span>
+                        <span class="flag" id="flag-v">V</span>
+                        <span class="flag">-</span>
+                        <span class="flag" id="flag-b">B</span>
+                        <span class="flag" id="flag-d">D</span>
+                        <span class="flag" id="flag-i">I</span>
+                        <span class="flag" id="flag-z">Z</span>
+                        <span class="flag" id="flag-c">C</span>
+                    </div>
+                </div>
+
+                <!-- Memory Tab -->
+                <div class="tab-content" id="memory-tab">
+                    <h3>Memory Viewer</h3>
+                    <div class="memory-controls">
+                        <label>Address: $<input type="text" id="memAddr" value="0000" maxlength="4"></label>
+                        <button id="memViewBtn" class="btn btn-small">View</button>
+                    </div>
+                    <pre id="memoryDump" class="memory-dump"></pre>
+                </div>
+
+                <!-- Disassembly Tab -->
+                <div class="tab-content" id="disasm-tab">
+                    <h3>Disassembler</h3>
+                    <div class="disasm-controls">
+                        <label>Address: $<input type="text" id="disasmAddr" value="0300" maxlength="4"></label>
+                        <button id="disasmBtn" class="btn btn-small">Disassemble</button>
+                        <button id="disasmPCBtn" class="btn btn-small">From PC</button>
+                    </div>
+                    <pre id="disasmOutput" class="disasm-output"></pre>
+                </div>
+
+                <!-- Disk Tab -->
+                <div class="tab-content" id="disk-tab">
+                    <h3>Disk Drives</h3>
+                    <div class="disk-controls">
+                        <label>Drive:
+                            <select id="driveSelect">
+                                <option value="0">Drive 0</option>
+                                <option value="1">Drive 1</option>
+                                <option value="2">Drive 2</option>
+                                <option value="3">Drive 3</option>
+                            </select>
+                        </label>
+                        <button id="formatDiskBtn" class="btn btn-small">Format</button>
+                    </div>
+                    <div class="disk-storage">
+                        <h4>Storage</h4>
+                        <label>Name: <input type="text" id="diskName" value="disk1"></label>
+                        <button id="saveDiskBtn" class="btn btn-small">Save to Browser</button>
+                        <button id="loadDiskBtn" class="btn btn-small">Load from Browser</button>
+                    </div>
+                    <div class="disk-files">
+                        <h4>Saved Disks</h4>
+                        <select id="savedDisksList" size="5"></select>
+                        <button id="downloadDiskBtn" class="btn btn-small">Download</button>
+                        <button id="deleteDiskBtn" class="btn btn-small">Delete</button>
+                    </div>
+                </div>
+
+                <!-- Breakpoints Tab -->
+                <div class="tab-content" id="breakpoints-tab">
+                    <h3>Breakpoints</h3>
+                    <div class="bp-controls">
+                        <label>Address: $<input type="text" id="bpAddr" value="0000" maxlength="4"></label>
+                        <button id="addBPBtn" class="btn btn-small">Add</button>
+                        <button id="clearBPBtn" class="btn btn-small">Clear All</button>
+                    </div>
+                    <div id="bpList" class="bp-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Enhanced Emulator - Full 6502 debugging, disk emulation, and assembler support</p>
+            <p>This is a non-commercial historical preservation project.</p>
+        </footer>
+    </div>
+
+    <script src="js/6502.js"></script>
+    <script src="js/assembler.js"></script>
+    <script src="js/disk.js"></script>
+    <script src="js/debugger.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/osi-c1p.js"></script>
+    <script src="js/hexdos-loader.js"></script>
+    <script src="js/main-enhanced.js"></script>
+</body>
+</html>

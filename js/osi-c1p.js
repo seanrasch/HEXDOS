@@ -96,6 +96,10 @@ class OSIC1P {
         this.cpu.memory[0xFFFE] = 0x00;
         this.cpu.memory[0xFFFF] = 0xFF;
 
+        // Screen cursor position (zero page)
+        this.cpu.memory[0xD0] = 0;  // Cursor X
+        this.cpu.memory[0xD1] = 0;  // Cursor Y
+
         // Simple BASIC cold start at 0xBD00
         let addr = 0xBD00;
 
@@ -104,17 +108,91 @@ class OSIC1P {
             0xA9, 0x03,       // LDA #$03 (clear screen char)
             0x20, 0x10, 0xBD, // JSR CHROUT
             0xA2, 0x00,       // LDX #$00
-            // Print loop
+            // Print loop at $BD08
             0xBD, 0x50, 0xBD, // LDA MESSAGE,X
             0xF0, 0x08,       // BEQ DONE
             0x20, 0x10, 0xBD, // JSR CHROUT
             0xE8,             // INX
-            0x4C, 0x08, 0xBD, // JMP LOOP
+            0x4C, 0x08, 0xBD, // JMP LOOP (back to $BD08)
             // DONE - infinite loop waiting for HEXDOS
             0x4C, 0x13, 0xBD, // JMP DONE
 
             // CHROUT routine at 0xBD10
-            0x8D, 0x00, 0xD0, // STA $D000 (screen memory)
+            // Input: A = character to output
+            0x48,             // PHA - save character
+
+            // Check for special characters
+            0xC9, 0x03,       // CMP #$03 (clear screen)
+            0xD0, 0x0A,       // BNE NOT_CLEAR
+            // Clear screen
+            0xA9, 0x00,       // LDA #$00
+            0x85, 0xD0,       // STA $D0 (cursor X = 0)
+            0x85, 0xD1,       // STA $D1 (cursor Y = 0)
+            0x68,             // PLA
+            0x60,             // RTS
+
+            // NOT_CLEAR at $BD20
+            0xC9, 0x0D,       // CMP #$0D (carriage return)
+            0xD0, 0x06,       // BNE NOT_CR
+            0xA9, 0x00,       // LDA #$00
+            0x85, 0xD0,       // STA $D0 (cursor X = 0)
+            0x68,             // PLA
+            0x60,             // RTS
+
+            // NOT_CR at $BD28
+            0xC9, 0x0A,       // CMP #$0A (line feed)
+            0xD0, 0x0A,       // BNE NOT_LF
+            0xA5, 0xD1,       // LDA $D1 (cursor Y)
+            0xC9, 0x1F,       // CMP #$1F (max row)
+            0xB0, 0x02,       // BCS SKIP_INC
+            0xE6, 0xD1,       // INC $D1
+            0x68,             // PLA
+            0x60,             // RTS
+
+            // NOT_LF at $BD34 - normal character output
+            0x68,             // PLA - restore character
+            0x48,             // PHA - save it again
+
+            // Calculate screen address: Y * 32 + X
+            0xA5, 0xD1,       // LDA $D1 (cursor Y)
+            0x0A,             // ASL (Y * 2)
+            0x0A,             // ASL (Y * 4)
+            0x0A,             // ASL (Y * 8)
+            0x0A,             // ASL (Y * 16)
+            0x0A,             // ASL (Y * 32)
+            0x85, 0xD2,       // STA $D2 (temp)
+
+            0x18,             // CLC
+            0x65, 0xD0,       // ADC $D0 (add cursor X)
+            0x85, 0xD3,       // STA $D3 (low byte of offset)
+            0xA9, 0x00,       // LDA #$00
+            0x85, 0xD4,       // STA $D4 (high byte of offset)
+
+            // Add screen base ($D000)
+            0x18,             // CLC
+            0xA5, 0xD3,       // LDA $D3
+            0x69, 0x00,       // ADC #$00
+            0x85, 0xD3,       // STA $D3
+            0xA5, 0xD4,       // LDA $D4
+            0x69, 0xD0,       // ADC #$D0
+            0x85, 0xD4,       // STA $D4
+
+            // Write character to screen using indirect addressing
+            0x68,             // PLA - restore character
+            0xA0, 0x00,       // LDY #$00
+            0x91, 0xD3,       // STA ($D3),Y
+
+            // Advance cursor
+            0xE6, 0xD0,       // INC $D0 (cursor X)
+            0xA5, 0xD0,       // LDA $D0
+            0xC9, 0x20,       // CMP #$20 (32 columns)
+            0x90, 0x08,       // BCC NO_WRAP
+            // Wrap to next line
+            0xA9, 0x00,       // LDA #$00
+            0x85, 0xD0,       // STA $D0 (cursor X = 0)
+            0xE6, 0xD1,       // INC $D1 (cursor Y)
+
+            // NO_WRAP
             0x60,             // RTS
         ];
 

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEXDOS 4.0 - Ohio Scientific C1P Emulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HEXDOS 4.0 Emulator</h1>
+            <p>Ohio Scientific Challenger 1P - Browser-based Historical Preservation</p>
+            <p class="copyright">Based on HEXDOS by Steven P. Hendrix (1980-2015)</p>
+        </header>
+
+        <div class="emulator-panel">
+            <div class="controls">
+                <button id="powerBtn" class="btn btn-power">POWER ON</button>
+                <button id="resetBtn" class="btn btn-reset" disabled>RESET</button>
+                <button id="loadHexdosBtn" class="btn btn-load" disabled>LOAD HEXDOS</button>
+                <div class="status">
+                    <span id="statusText">System Off</span>
+                    <span id="cpuSpeed" class="cpu-speed"></span>
+                </div>
+            </div>
+
+            <div class="terminal-container">
+                <canvas id="terminal" width="512" height="480"></canvas>
+                <div id="overlay-message" class="overlay-message">
+                    Press POWER ON to start the Ohio Scientific C1P emulator
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>System Information</h3>
+                <div class="system-info">
+                    <div><strong>CPU:</strong> MOS 6502 @ 1 MHz</div>
+                    <div><strong>Memory:</strong> 8K RAM</div>
+                    <div><strong>Display:</strong> 32x32 character text mode</div>
+                    <div><strong>ROM:</strong> OSI BASIC-in-ROM</div>
+                </div>
+
+                <h3>Quick Start</h3>
+                <ol class="instructions">
+                    <li>Click <strong>POWER ON</strong> to boot into OSI BASIC</li>
+                    <li>Click <strong>LOAD HEXDOS</strong> to load the HEXDOS operating system</li>
+                    <li>Use your keyboard to interact with the system</li>
+                    <li>Type <code>HELP</code> in HEXDOS for available commands</li>
+                </ol>
+
+                <h3>About HEXDOS</h3>
+                <p>HEXDOS 4.0 is a disk operating system developed for the Ohio Scientific C1P
+                computer in the early 1980s. This emulator preserves this historical software
+                for educational and hobbyist purposes.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>This is a non-commercial historical preservation project.</p>
+            <p>HEXDOS source code used under permission for non-commercial hobbyist purposes.</p>
+        </footer>
+    </div>
+
+    <script src="js/6502.js"></script>
+    <script src="js/osi-c1p.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/hexdos-loader.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

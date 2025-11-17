@@ -123,15 +123,26 @@ class OSIC1P {
 
             // Check for special characters
             0xC9, 0x03,       // CMP #$03 (clear screen)
-            0xD0, 0x0A,       // BNE NOT_CLEAR
-            // Clear screen
+            0xD0, 0x1D,       // BNE NOT_CLEAR (+29 bytes)
+            // Clear screen - fill with spaces
+            0xA9, 0x20,       // LDA #$20 (space character)
+            0xA2, 0x00,       // LDX #$00
+            0xA0, 0x04,       // LDY #$04 (4 pages = 1024 bytes)
+            // CLEAR_LOOP at $BD1B
+            0x9D, 0x00, 0xD0, // STA $D000,X
+            0x9D, 0x00, 0xD1, // STA $D100,X
+            0x9D, 0x00, 0xD2, // STA $D200,X
+            0x9D, 0x00, 0xD3, // STA $D300,X
+            0xE8,             // INX
+            0xD0, 0xF1,       // BNE CLEAR_LOOP
+            // Reset cursor
             0xA9, 0x00,       // LDA #$00
             0x85, 0xD0,       // STA $D0 (cursor X = 0)
             0x85, 0xD1,       // STA $D1 (cursor Y = 0)
             0x68,             // PLA
             0x60,             // RTS
 
-            // NOT_CLEAR at $BD20
+            // NOT_CLEAR at $BD32
             0xC9, 0x0D,       // CMP #$0D (carriage return)
             0xD0, 0x06,       // BNE NOT_CR
             0xA9, 0x00,       // LDA #$00
@@ -139,7 +150,7 @@ class OSIC1P {
             0x68,             // PLA
             0x60,             // RTS
 
-            // NOT_CR at $BD28
+            // NOT_CR at $BD3A
             0xC9, 0x0A,       // CMP #$0A (line feed)
             0xD0, 0x0A,       // BNE NOT_LF
             0xA5, 0xD1,       // LDA $D1 (cursor Y)
@@ -149,7 +160,7 @@ class OSIC1P {
             0x68,             // PLA
             0x60,             // RTS
 
-            // NOT_LF at $BD34 - normal character output
+            // NOT_LF at $BD46 - normal character output
             0x68,             // PLA - restore character
             0x48,             // PHA - save it again
 

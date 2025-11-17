@@ -23,19 +23,19 @@ class HEXDOSLoader {
 
         // Print "HEXDOS 4.0" message
         program.push(0xA2, 0x00);       // LDX #$00
-        // Loop: LDA MESSAGE,X
+        // Loop at $0307: LDA MESSAGE,X
         program.push(0xBD, 0x50, 0x03); // LDA $0350,X
         program.push(0xF0, 0x08);       // BEQ DONE (+8)
         program.push(0x20, 0x30, 0x03); // JSR CHROUT
         program.push(0xE8);             // INX
-        program.push(0x4C, 0x09, 0x03); // JMP LOOP
+        program.push(0x4C, 0x07, 0x03); // JMP LOOP (back to $0307)
 
-        // DONE: Wait for input loop
+        // DONE at $0313: Wait for input loop
         program.push(0xAD, 0x00, 0xDF); // LDA KEYBOARD
         program.push(0x10, 0xFB);       // BPL WAIT (-5)
         program.push(0x29, 0x7F);       // AND #$7F
         program.push(0x20, 0x30, 0x03); // JSR CHROUT
-        program.push(0x4C, 0x15, 0x03); // JMP INPUT_LOOP
+        program.push(0x4C, 0x13, 0x03); // JMP INPUT_LOOP (back to $0313)
 
         // CHROUT routine at $0330
         program.push(...new Array(0x30 - program.length).fill(0xEA)); // Fill with NOPs
